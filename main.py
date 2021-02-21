@@ -4,6 +4,7 @@ import telebot
 from telebot.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from flask import Flask, request
 from model import Participants
+import logging
 
 
 TOKEN = os.environ["API_TOKEN"]
@@ -44,10 +45,11 @@ kb_bid_reply.add(
 @bot.callback_query_handler(func=lambda c: c.data.startswith('kb_pred'))
 def callback_handle_kb_pred(c: CallbackQuery):
     code = c.data[-1]
+    user_id = str(c.from_user.id)
     if code == "1":
-        predictions[c.from_user.id] = "pass"
+        predictions[user_id] = "pass"
     else:
-        predictions[c.from_user.id] = "fail"
+        predictions[user_id] = "fail"
     bot.send_message(c.message.chat.id,
                      text="Gotcha, I saved your prediction!\nNow choose amount of bid.",
                      reply_markup=kb_bid_reply)
@@ -59,7 +61,7 @@ def callback_handle_kb_bid(c: CallbackQuery):
     code = c.data[-1]
     user = c.from_user
     username = user.username
-    user_id = user.id
+    user_id = str(user.id)
     chat_id = c.message.chat.id
 
     if code == "1":
@@ -86,7 +88,7 @@ def custom_money_input(m: Message):
     global IS_RUNNING
     user = m.from_user
     chat_id = m.chat.id
-    user_id = user.id
+    user_id = str(user.id)
     username = user.username
     text = m.text
 
@@ -110,7 +112,7 @@ def bid(m: Message):
         btn_pred_p = InlineKeyboardButton('Pass: 1.29', callback_data='kb_pred_btn1')
         btn_pred_f = InlineKeyboardButton('Fail: 3.64', callback_data='kb_pred_btn2')
 
-        user_prediction = db.get_prediction(m.from_user.id)
+        user_prediction = db.get_prediction(str(m.from_user.id))
         if not user_prediction:
             kb = InlineKeyboardMarkup(row_width=1)
             kb.add(btn_pred_p, btn_pred_f)
@@ -126,9 +128,10 @@ def bid(m: Message):
 
 
 @bot.message_handler(commands=['getbid'])
-def getbids(m: Message):
+def getbid(m: Message):
     user = m.from_user
-    value = db.get_value(user.id)
+    user_id = str(user.id)
+    value = db.get_value(user_id)
     if not value:
         bot.send_message(m.chat.id, text=f"You've not bet on Tischa's yet.")
         return
@@ -154,7 +157,7 @@ def getallbids(m: Message):
             msg = "No one have bet on Tischa yet."
         bot.send_message(chat_id, msg)
     else:
-        bot.send_message(m.chat.id, "You're not allowed to watch this statistics!")
+        bot.send_message(chat_id, "You're not allowed to watch this statistics!")
 
 
 @bot.message_handler(commands=['help'])

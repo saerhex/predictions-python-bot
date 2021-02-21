@@ -28,9 +28,8 @@ class Participants:
     def get_value(self, user_id: str):
         db = sqlite3.connect(self.dbn)
         cursor = db.cursor()
-        cursor.execute("""select username,prediction,sum(money) from participants 
-                          group by username having user_id="id";
-                       """, {"id": user_id})
+        cursor.execute("select username,prediction,sum(money) from participants group by username having user_id=?;",
+                       (user_id, ))
         db.commit()
         results = cursor.fetchone()
         db.close()
@@ -39,7 +38,7 @@ class Participants:
     def get_prediction(self, user_id: str):
         db = sqlite3.connect(self.dbn)
         cursor = db.cursor()
-        cursor.execute('select prediction from participants where user_id="user_id";', {"user_id": user_id})
+        cursor.execute('select prediction from participants where user_id="id";', {"id": user_id})
         db.commit()
         results = cursor.fetchone()
         db.close()
