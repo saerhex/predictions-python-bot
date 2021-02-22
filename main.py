@@ -129,9 +129,9 @@ def getbid(m: Message):
         bot.send_message(m.chat.id, text=f"You've not bet on Tischa's yet.")
         return
     if value[1] == "pass":
-        mul_coef = coefficients[0]
-    else:
         mul_coef = coefficients[1]
+    else:
+        mul_coef = coefficients[0]
     gained = round(value[2]*mul_coef + value[2], 2)
     bot.send_message(m.chat.id, text=f"User {value[0]} bid: {value[2]} on {value[1]}. You'll gain {gained} BYN.")
 
@@ -178,6 +178,12 @@ def shit(m: Message):
 def start(m: Message):
     chat_id = m.chat.id
     bot.send_message(chat_id, "Hey, vagabond...\nAh, I see you're man of culture as well.")
+
+
+@bot.message_handler(commands=['getcoefs'])
+def getcoefs(m: Message):
+    chat_id = m.chat.id
+    bot.send_message(chat_id, f"On fail: {coefficients[0]}\nOn pass: {coefficients[1]}")
 
 
 @app.route("/" + TOKEN, methods=["POST"])
