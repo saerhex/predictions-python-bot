@@ -39,8 +39,8 @@ class Coefficients:
         pass_perc, fail_perc = Coefficients.is_zero_chance(pass_sum / summary, fail_sum / summary)
 
         pass_delta, fail_delta = Coefficients.get_deltas(pass_perc, fail_perc)
-        pass_perc += pass_delta
-        fail_perc += fail_delta
+        fail_perc = percentage[0] + fail_delta
+        pass_perc = percentage[1] + pass_delta
 
         Coefficients.set_coefs(pass_perc, fail_perc)
 
@@ -54,8 +54,8 @@ class Coefficients:
 
     @staticmethod
     def get_deltas(pass_perc, fail_perc):
-        pass_delta = pass_perc - percentage[0]
-        fail_delta = fail_perc - percentage[1]
+        fail_delta = round(fail_perc - percentage[0], 2)
+        pass_delta = round(pass_perc - percentage[1], 2)
         return pass_delta, fail_delta
 
     @staticmethod
