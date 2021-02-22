@@ -28,7 +28,7 @@ class Coefficients:
             fail_sum = 0
             pass_sum = int(pass_sum[1])
         else:
-            pass_sum, fail_sum = int(pass_sum[1]), int(fail_sum[1])
+            pass_sum, fail_sum = float(pass_sum[1]), float(fail_sum[1])
 
         Coefficients.balance_percentage(fail_sum, pass_sum)
 
@@ -64,3 +64,5 @@ class Coefficients:
         p_coef = round(1 / pass_perc, 2)
         f_coef = round(1 / fail_perc, 2)
         coefficients = (f_coef, p_coef)
+
+print(Coefficients.get_coefficients())
