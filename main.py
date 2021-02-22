@@ -14,23 +14,15 @@ COEFFICENTS = (1.29, 3.64)
 IS_RUNNING = False
 
 bot = telebot.TeleBot(TOKEN)
-# bot.remove_webhook()
-# bot.set_webhook(url=URL)
 
+app = Flask(__name__)
 
-# app = Flask(__name__)
 
 db = Participants("predictions.db")
 
+
 predictions = {}
 money = {}
-
-
-# @app.route("/", methods=["POST"])
-# def hook():
-#     update = telebot.types.Update.de_json(request.stream.read().decode('utf-8'))
-#     bot.process_new_updates([update])
-#     return 'OK', 200
 
 
 kb_bid_reply = InlineKeyboardMarkup()
@@ -187,4 +179,19 @@ def start(m: Message):
     bot.send_message(chat_id, "Hey, vagabond...\nAh, I see you're man of culture as well.")
 
 
-bot.polling(none_stop=True)
+@app.route("/" + TOKEN, methods=["POST"])
+def get_message():
+    update = telebot.types.Update.de_json(request.stream.read().decode('utf-8'))
+    bot.process_new_updates([update])
+    return 'OK', 200
+
+
+@app.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=URL + TOKEN)
+    return 'OK', 200
+
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))

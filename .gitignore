@@ -3,7 +3,6 @@
 .idea/
 #self
 
-*.db
 /Database
 *.bat
 
