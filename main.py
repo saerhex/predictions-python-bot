@@ -102,8 +102,8 @@ def bid(m: Message):
     global IS_RUNNING
     if not IS_RUNNING:
         IS_RUNNING = True
-        btn_pred_p = InlineKeyboardButton(f'Pass: {coefficients[0]}', callback_data='kb_pred_btn1')
-        btn_pred_f = InlineKeyboardButton(f'Fail: {coefficients[1]}', callback_data='kb_pred_btn2')
+        btn_pred_p = InlineKeyboardButton(f'Pass: {coefficients[1]}', callback_data='kb_pred_btn1')
+        btn_pred_f = InlineKeyboardButton(f'Fail: {coefficients[0]}', callback_data='kb_pred_btn2')
 
         user_prediction = db.get_prediction(str(m.from_user.id))
         if not user_prediction:
