@@ -15,13 +15,17 @@ class Coefficients:
     @staticmethod
     def calc_coefs():
         global coefficients
-        pass_sum = db.get_pred_by_type("pass")[1]
-        fail_sum = db.get_pred_by_type("fail")[1]
+        pass_sum = db.get_pred_by_type("pass")
+        fail_sum = db.get_pred_by_type("fail")
 
         if not pass_sum and not fail_sum:
             coefficients = (1 / percentage[0], 1 / percentage[1])
+        elif not pass_sum:
+            pass_sum = 0
+        elif not fail_sum:
+            fail_sum = 0
         else:
-            pass_sum, fail_sum = int(pass_sum), int(fail_sum)
+            pass_sum, fail_sum = int(pass_sum[1]), int(fail_sum[1])
 
         Coefficients.balance_percentage(fail_sum, pass_sum)
 
