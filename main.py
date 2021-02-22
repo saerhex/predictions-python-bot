@@ -4,13 +4,13 @@ import telebot
 from telebot.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from flask import Flask, request
 from model import Participants
+import coefficents as coef
 import logging
 
 
 TOKEN = os.getenv("API_TOKEN")
 URL = os.getenv("BOT_URL")
 ADMIN_ID = os.getenv("MY_ID")
-COEFFICENTS = (1.29, 3.64)
 IS_RUNNING = False
 
 bot = telebot.TeleBot(TOKEN)
@@ -23,6 +23,7 @@ db = Participants("predictions.db")
 
 predictions = {}
 money = {}
+coefficients = (1.29, 3.64)
 
 
 kb_bid_reply = InlineKeyboardMarkup()
@@ -101,8 +102,8 @@ def bid(m: Message):
     global IS_RUNNING
     if not IS_RUNNING:
         IS_RUNNING = True
-        btn_pred_p = InlineKeyboardButton('Pass: 1.29', callback_data='kb_pred_btn1')
-        btn_pred_f = InlineKeyboardButton('Fail: 3.64', callback_data='kb_pred_btn2')
+        btn_pred_p = InlineKeyboardButton(f'Pass: {coefficients[0]}', callback_data='kb_pred_btn1')
+        btn_pred_f = InlineKeyboardButton(f'Fail: {coefficients[1]}', callback_data='kb_pred_btn2')
 
         user_prediction = db.get_prediction(str(m.from_user.id))
         if not user_prediction:
@@ -128,10 +129,10 @@ def getbid(m: Message):
         bot.send_message(m.chat.id, text=f"You've not bet on Tischa's yet.")
         return
     if value[1] == "pass":
-        coef = COEFFICENTS[0]
+        mul_coef = coefficients[0]
     else:
-        coef = COEFFICENTS[1]
-    gained = round(value[2]*coef + value[2], 2)
+        mul_coef = coefficients[1]
+    gained = round(value[2]*mul_coef + value[2], 2)
     bot.send_message(m.chat.id, text=f"User {value[0]} bid: {value[2]} on {value[1]}. You'll gain {gained} BYN.")
 
 
@@ -181,6 +182,8 @@ def start(m: Message):
 
 @app.route("/" + TOKEN, methods=["POST"])
 def get_message():
+    global coefficients
+    coefficients = coef.Coefficients.get_coefficients()
     update = telebot.types.Update.de_json(request.stream.read().decode('utf-8'))
     bot.process_new_updates([update])
     return 'OK', 200
