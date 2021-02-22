@@ -20,10 +20,13 @@ class Coefficients:
 
         if not pass_sum and not fail_sum:
             coefficients = (1 / percentage[0], 1 / percentage[1])
+            return
         elif not pass_sum:
             pass_sum = 0
+            fail_sum = int(fail_sum[1])
         elif not fail_sum:
             fail_sum = 0
+            pass_sum = int(pass_sum[1])
         else:
             pass_sum, fail_sum = int(pass_sum[1]), int(fail_sum[1])
 
