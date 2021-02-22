@@ -132,7 +132,7 @@ def getbid(m: Message):
         mul_coef = coefficients[1]
     else:
         mul_coef = coefficients[0]
-    gained = round(value[2]*mul_coef + value[2], 2)
+    gained = round(value[2] * mul_coef, 2)
     bot.send_message(m.chat.id, text=f"User {value[0]} bid: {value[2]} on {value[1]}. You'll gain {gained} BYN.")
 
 
