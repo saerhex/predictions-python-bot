@@ -52,3 +52,13 @@ class Participants:
         results = cursor.fetchall()
         db.close()
         return results
+
+    def get_pred_by_type(self, type: str):
+        db = sqlite3.connect(self.dbn)
+        cursor = db.cursor()
+        cursor.execute('select prediction, sum(money) from participants group by prediction having prediction=?;',
+                       (type, ))
+        db.commit()
+        result = cursor.fetchone()
+        db.close()
+        return result
