@@ -7,8 +7,8 @@ from model import Participants
 import logging
 
 
-TOKEN = os.environ["API_TOKEN"]
-URL = os.environ["BOT_URL"]
+TOKEN = os.getenv("API_TOKEN")
+URL = os.getenv("BOT_URL")
 ADMIN_ID = os.getenv("MY_ID")
 COEFFICENTS = (1.29, 3.64)
 IS_RUNNING = False
