@@ -64,5 +64,3 @@ class Coefficients:
         p_coef = round(1 / pass_perc, 2)
         f_coef = round(1 / fail_perc, 2)
         coefficients = (f_coef, p_coef)
-
-print(Coefficients.get_coefficients())

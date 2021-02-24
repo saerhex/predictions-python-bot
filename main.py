@@ -11,7 +11,6 @@ import logging
 TOKEN = os.getenv("API_TOKEN")
 URL = os.getenv("BOT_URL")
 ADMIN_ID = os.getenv("MY_ID")
-IS_RUNNING = False
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -50,7 +49,6 @@ def callback_handle_kb_pred(c: CallbackQuery):
 
 @bot.callback_query_handler(func=lambda c: c.data.startswith('kb_bid'))
 def callback_handle_kb_bid(c: CallbackQuery):
-    global IS_RUNNING
     code = c.data[-1]
     user = c.from_user
     username = user.username
@@ -59,26 +57,19 @@ def callback_handle_kb_bid(c: CallbackQuery):
 
     if code == "1":
         money[user_id] = 0.5
-        IS_RUNNING = False
     elif code == "2":
         money[user_id] = 1.5
-        IS_RUNNING = False
     elif code == "3":
         money[user_id] = 3.5
-        IS_RUNNING = False
     elif code == "4":
         msg = bot.send_message(chat_id, "Enter your amount of money.")
         bot.register_next_step_handler(msg, custom_money_input)
-        IS_RUNNING = True
 
-    if not IS_RUNNING:
-        db.insert_values((user_id, username, predictions[user_id], money[user_id]))
-        bot.send_message(c.message.chat.id, text="Gotcha, I saved your bid!")
-        IS_RUNNING = False
+    db.insert_values((user_id, username, predictions[user_id], money[user_id]))
+    bot.send_message(c.message.chat.id, text="Gotcha, I saved your bid!")
 
 
 def custom_money_input(m: Message):
-    global IS_RUNNING
     user = m.from_user
     chat_id = m.chat.id
     user_id = str(user.id)
@@ -94,30 +85,26 @@ def custom_money_input(m: Message):
     money[user_id] = int(match.group(0))
     db.insert_values((user_id, username, predictions[user_id], money[user_id]))
     bot.send_message(chat_id, text="Gotcha, I saved your bid!")
-    IS_RUNNING = False
 
 
 @bot.message_handler(commands=['bid'])
 def bid(m: Message):
-    global IS_RUNNING
-    if not IS_RUNNING:
-        IS_RUNNING = True
-        btn_pred_p = InlineKeyboardButton(f'Pass: {coefficients[1]}', callback_data='kb_pred_btn1')
-        btn_pred_f = InlineKeyboardButton(f'Fail: {coefficients[0]}', callback_data='kb_pred_btn2')
+    btn_pred_p = InlineKeyboardButton(f'Pass: {coefficients[1]}', callback_data='kb_pred_btn1')
+    btn_pred_f = InlineKeyboardButton(f'Fail: {coefficients[0]}', callback_data='kb_pred_btn2')
 
-        user_prediction = db.get_prediction(str(m.from_user.id))
-        if not user_prediction:
-            kb = InlineKeyboardMarkup(row_width=1)
-            kb.add(btn_pred_p, btn_pred_f)
-        elif user_prediction[0] == "pass":
-            kb = InlineKeyboardMarkup()
-            kb.add(btn_pred_p)
-        else:
-            kb = InlineKeyboardMarkup()
-            kb.add(btn_pred_f)
+    user_prediction = db.get_prediction(str(m.from_user.id))
+    if not user_prediction:
+        kb = InlineKeyboardMarkup(row_width=1)
+        kb.add(btn_pred_p, btn_pred_f)
+    elif user_prediction[0] == "pass":
+        kb = InlineKeyboardMarkup()
+        kb.add(btn_pred_p)
+    else:
+        kb = InlineKeyboardMarkup()
+        kb.add(btn_pred_f)
 
-        bot.send_sticker(m.chat.id, "CAACAgIAAxkBAALb3mAxW_HxbZptc1xq7Oi1f1FSDj88AAJiAwACbbBCA5mTqKDVhSM1HgQ")
-        bot.send_message(m.chat.id, "Now i'll send you predictions...", reply_markup=kb)
+    bot.send_sticker(m.chat.id, "CAACAgIAAxkBAALb3mAxW_HxbZptc1xq7Oi1f1FSDj88AAJiAwACbbBCA5mTqKDVhSM1HgQ")
+    bot.send_message(m.chat.id, "Now i'll send you predictions...", reply_markup=kb)
 
 
 @bot.message_handler(commands=['getbid'])
