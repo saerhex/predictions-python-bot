@@ -78,11 +78,22 @@ def custom_money_input(m: Message):
 
     match = re.match(r'\d+\.*\d*', text)
     if not match:
-        msg = bot.send_message(chat_id, "You've forgot some numbers in your input. Try one more time")
+        msg = bot.send_message(chat_id, "You've forgot some numbers in your input. Try one more time!")
         bot.register_next_step_handler(msg, custom_money_input)
         return
 
-    money[user_id] = int(match.group(0))
+    m = int(match.group(0))
+    if m <= 0:
+        msg = bot.send_message(chat_id, "Only positive inputs. Try one more time!")
+        bot.register_next_step_handler(msg, custom_money_input)
+        return
+
+    if m >= 1000:
+        msg = bot.send_message(chat_id, "Too huge bid on Tisha's for student and even EPAM-workers. Try one more time!")
+        bot.register_next_step_handler(msg, custom_money_input)
+        return
+
+    money[user_id] = m
     db.insert_values((user_id, username, predictions[user_id], money[user_id]))
     bot.send_message(chat_id, text="Gotcha, I saved your bid!")
 
@@ -119,7 +130,7 @@ def getbid(m: Message):
         mul_coef = coefficients[1]
     else:
         mul_coef = coefficients[0]
-    gained = round(value[2] * mul_coef, 2)
+    gained = round(value[2] * mul_coef, 4)
     bot.send_message(m.chat.id, text=f"User {value[0]} bid: {value[2]} on {value[1]}. You'll gain {gained} BYN.")
 
 
